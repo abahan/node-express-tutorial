@@ -35,7 +35,19 @@ app.get('/api/channels', (req, res) => {
     res.status(200).json(channels);
 });
 
-//////////////////////////////////////
+app.delete('/api/channels/:id', (req, res) => {       ///////////// delete channel by id
+    const { id } = req.params;
+    const deleted = channels.find(channel => channel.id === id);
+    if (deleted) {
+        channels = channels.filter(channel => channel.id !== id);
+        res.status(200).json(deleted);
+
+    } else {
+        res.status(404).json({ message: 'Channel not found' });
+    }
+});
+
+//////////////////////////////////////////////////////////////////////////
 
 app.post('/api/lessons/', (req, res) => {
     const lessonInfo = req.body;
@@ -48,19 +60,58 @@ app.get('/api/lessons', (req, res) => {
     res.status(200).json(lessons);
 });
 
-app.delete('/api/channels/:id', (req, res) => {
+app.get('/api/lessons/:id', (req, res) => {      ///////////// get lesson by id
     const { id } = req.params;
-    const deleted = channels.find(channel => channel.id === id);
-    if (deleted) {
-        channels = channels.filter(channel => channel.id !== id);
-        res.status(200).json(deleted);
-
+    const found = lessons.find(lesson => lesson.id === id);
+    if (found) {
+        res.status(200).json(found);
     } else {
-        res.status(404).json({ message: 'Channel not found' });
+        res.status(404).json({ message: 'Lesson not found' });
     }
 });
 
-//////////////////////////////////////
+app.delete('/api/lessons/:id', (req, res) => {      ///////////// delete lesson by id
+    const { id } = req.params;
+    const deleted = lessons.find(lesson => lesson.id === id);
+    if (deleted) {
+        lessons = lessons.filter(lesson => lesson.id !== id);
+        res.status(200).json(deleted);
+    }
+    else {
+        res.status(404).json({message: "lesson not found"});
+    }
+});
+
+app.put('/api/lessons/:id', (req, res) => {      ///////////// update lesson by id. "PUT" will replace the whole
+                                                ////////////// object, so we need to send the whole object
+    const { id } = req.params;
+    const changes = req.body;
+    const index = lessons.findIndex(lesson => lesson.id === id);
+    if (index !== -1) {
+        lessons[index] = changes;
+        res.status(200).json(lessons[index]);
+    } else {
+        res.status(404).json({ message: 'Lesson not found' });
+    }
+});
+
+app.patch('/api/lessons/:id', (req, res) => {      ///////////// update lesson by id___ "patch" is more efficient than "PUT"
+    const { id } = req.params;
+    const changes = req.body;
+    const found = lessons.find(lesson => lesson.id === id);
+    if (found) {
+        Object.assign(found, changes);
+        res.status(200).json(found);
+    
+    } else {
+        res.status(404).json({ message: 'Lesson not found' });
+    }
+});
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
 //******************************************************************** */
 
 app.listen(port, () => console.log(`\n*** Server running on port ${port}`));
